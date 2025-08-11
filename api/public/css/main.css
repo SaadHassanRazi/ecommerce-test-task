@@ -300,3 +300,13 @@ form {
 img {
   height: 15rem;
 }
+
+.product-info-icon {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.product-info-icon svg {
+  margin-right: 8px;
+}

@@ -4,6 +4,10 @@ import { addCart } from "../redux/action";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+import { FiTag, FiPackage, FiLayers } from "react-icons/fi";
+
 
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -21,23 +25,38 @@ const Products = () => {
   };
 
   useEffect(() => {
+
     const getProducts = async () => {
       setLoading(true);
       const response = await fetch("https://fakestoreapi.com/products/");
+      let products = await response.json()
+     
+      products = products.map((product)=>({
+        ...product,
+        stock:Math.floor(Math.random() * 10),
+        variants:['small','medium','large']
+      }))
+       localStorage.setItem('products',JSON.stringify(products))
       if (componentMounted) {
-        setData(await response.clone().json());
-        setFilter(await response.json());
+        setData(products);
+        setFilter(products);
         setLoading(false);
       }
-
+console.log('data---',data)
       return () => {
         componentMounted = false;
       };
     };
 
+    const products = localStorage.getItem('products')
+    if(products){
+        setData(JSON.parse(products));
+        setFilter(JSON.parse(products));
+        setLoading(false);
+    }else{
     getProducts();
+    }
   }, []);
-
   const Loading = () => {
     return (
       <>
@@ -129,19 +148,35 @@ const Products = () => {
                     {product.description.substring(0, 90)}...
                   </p>
                 </div>
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item lead">$ {product.price}</li>
-                  {/* <li className="list-group-item">Dapibus ac facilisis in</li>
-                    <li className="list-group-item">Vestibulum at eros</li> */}
-                </ul>
+                <div className="d-flex flex-column align-items-start px-3 py-2 text-start">
+                  <div className="mb-2 d-flex align-items-center">
+                    <FiTag size={18} className="me-2 text-success" />
+                    <span className="fw-bold">${product.price}</span>
+                  </div>
+                  <div className="mb-2 d-flex align-items-center">
+                    <FiPackage size={18} className="me-2 text-primary" />
+                    <span>{product.stock} in stock</span>
+                  </div>
+                  <div className="d-flex align-items-center">
+                    <FiLayers size={18} className="me-2 text-warning" />
+                    <Dropdown
+                      options={product.variants}
+                      placeholder="Select size"
+                      className="flex-grow-1 rounded"
+                    />
+                  </div>
+                </div>
+
+                
                 <div className="card-body">
-                  <Link
+                 {product.stock > 0 && <Link
                     to={"/product/" + product.id}
                     className="btn btn-dark m-1"
+                    style={{pointerEvents: product.stock ==0 ?'none':'auto'}}
                   >
                     Buy Now
-                  </Link>
-                  <button
+                  </Link>}
+                  {product.stock > 0 ? <button
                     className="btn btn-dark m-1"
                     onClick={() => {
                       toast.success("Added to cart");
@@ -149,7 +184,12 @@ const Products = () => {
                     }}
                   >
                     Add to Cart
-                  </button>
+                  </button> : <button
+                    className="btn btn-danger m-1"
+                    
+                  >
+                   Out of Stock
+                  </button>}
                 </div>
               </div>
             </div>

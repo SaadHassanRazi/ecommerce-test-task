@@ -1,4 +1,5 @@
 {
+  "homepage":"https://SaadHassanRazi.github.io/ecommerce-test-task/",
   "name": "ecommerce",
   "version": "0.1.0",
   "private": true,
@@ -62,7 +63,9 @@
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts eject",
     "eject": "react-scripts eject",
-    "install":"npm install --legacy-peer-deps"
+    "install": "npm install --legacy-peer-deps",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -81,5 +84,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
